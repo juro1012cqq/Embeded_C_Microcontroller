@@ -2,6 +2,7 @@
 //  Author: juro1012cqq
 //  Date:   4/3/22
 //  License: FREE.
+//  Enviroment: OS supported by CCS
 //
 #ifndef __My16f887_h__
 #define __My16f887_h__
@@ -109,7 +110,7 @@ int tmp, tmp1;
 #define TMR0_2_ADDR     0x101
 #define PCL2_ADDR       0x102
 #define STATUS2_ADDR    0x103
-#define FSR2_ADD        0x104
+#define FSR2_ADDR       0x104
 #define WDTCON_ADDR     0x105
 #define PORTB2_ADDR     0x106
 #define CM1CON0_ADDR    0x107
@@ -142,6 +143,93 @@ int tmp, tmp1;
 #ifndef __my_byte_address__
 #define __my_byte_address__
 
+// Bank 0:
+#byte TMR0              = TMR0_ADDR
+#byte PCL0              = PCL0_ADDR
+#byte STATUS0           = STATUS0_ADDR
+#byte FSR0              = FSR0_ADDR
+#byte PCLATH0           = PCLATH0_ADDR
+#byte INTCON0           = INTCON0_ADDR
+#byte PIR1              = PIR1_ADDR
+#byte PIR2              = PIR2_ADDR
+#byte TMR1L             = TMR1L_ADDR
+#byte TMR1H             = TMR1H_ADDR
+#byte T1CON             = T1CON_ADDR
+#byte TMR2              = TMR2_ADDR
+#byte T2CON             = T2CON_ADDR
+#byte SSPBUF            = SSPBUF_ADDR
+#byte SSPCON            = SSPCON_ADDR
+#byte CCPR1L            = CCPR1L_ADDR
+#byte CCPR1H            = CCPR1H_ADDR
+#byte CCP1CON           = CCP1CON_ADDR
+#byte RCSTA             = RCSTA_ADDR
+#byte TXREG             = TXREG_ADDR
+#byte RCREG             = RCREG_ADDR
+#byte CCPR2L            = CCPR2L_ADDR
+#byte CCPR2H            = CCPR2H_ADDR
+#byte CCP2CON           = CCP2CON_ADDR
+#byte ADRESH            = ADRESH_ADDR
+#byte ADCON0            = ADCON0_ADDR
+
+//Bank 1:
+#byte OPTIONREG1        = OPTIONREG1_ADDR
+#byte PCL1              = PCL1_ADDR
+#byte STATUS1           = STATUS1_ADDR
+#byte FSR1              = FSR1_ADDR
+#byte PCLATH1           = PCLATH1_ADDR
+#byte INTCON1           = INTCON1_ADDR
+#byte PIE1              = PIE1_ADDR
+#byte PIE2              = PIE2_ADDR
+#byte PCON              = PCON_ADDR
+#byte OSCCON            = OSCCON_ADDR
+#byte OSCTUNE           = OSCTUNE_ADDR
+#byte SSPCON2           = SSPCON2_ADDR
+#byte PR2               = PR2_ADDR
+#byte SSPADD            = SSPADD_ADDR
+#byte SSPSTAT           = SSPSTAT_ADDR
+#byte WPUB              = WPUB_ADDR
+#byte IOCB              = IOCB_ADDR
+#byte VRCON             = VRCON_ADDR
+#byte TXSTA             = TXSTA_ADDR
+#byte SPBRG             = SPBRG_ADDR
+#byte SPBRGh            = SPBRGh_ADDR
+#byte PWM1CON           = PWM1CON_ADDR
+#byte ECCPAS            = ECCPAS_ADDR
+#byte PSTRCON           = PSTRCON_ADDR
+#byte ADRESL            = ADRESL_ADDR
+#byte ADCON1            = ADCON1_ADDR
+
+// Bank 2:
+#byte TMR0_2            = TMR0_2_ADDR
+#byte PCL2              = PCL2_ADDR
+#byte STATUS2           = STATUS2_ADDR
+#byte FSR2              = FSR2_ADDR
+#byte WDTCON            = WDTCON_ADDR
+#byte PORTB2            = PORTB2_ADDR
+#byte CM1CON0           = CM1CON0_ADDR
+#byte CM2CON0           = CM2CON0_ADDR
+#byte CM2CON1           = CM2CON1_ADDR
+#byte PCLATH2           = PCLATH2_ADDR
+#byte INTCON2           = INTCON2_ADDR
+#byte EEDAT             = EEDAT_ADDR
+#byte EEADR             = EEADR_ADDR
+#byte EEDATH            = EEDATH_ADDR
+#byte EEADRH            = EEADRH_ADDR
+
+// Bank 3:
+#byte OPTIONREG3        = OPTIONREG3_ADDR
+#byte PCL3              = PCL3_ADDR
+#byte STATUS3           = STATUS3_ADDR
+#byte FSR3              = FSR3_ADDR
+#byte SRCON             = SRCON_ADDR
+#byte TRISB3            = TRISB3_ADDR
+#byte BAUDCTL           = BAUDCTL_ADDR
+#byte ANSEL             = ANSEL_ADDR
+#byte ANSELH            = ANSELH_ADDR
+#byte PCLATH3           = PCLATH3_ADDR
+#byte INTCON3           = INTCON3_ADDR
+#byte EECON1            = EECON1_ADDR
+#byte EECON2            = EECON2_ADDR
 
 typedef struct {
     unsigned P0 : 1; 
@@ -158,31 +246,31 @@ typedef struct {
 //////////////////////////////////////////////////////////////////////////////////////////
 
 /*--------------------------------------------------------------------------------------*/
-// DEFINE PORT<A:E> REGISTER MEMORY: P<A:E>.P<0:7>, PORT<A:E> TRS<A:E>.B<0:7> TRIS<A:E>//
+// DEFINE PORT<A:E> REGISTER MEMORY: BPort<A:E>.P<0:7>, PORT<A:E> BTris<A:E>.B<0:7> TRIS<A:E>//
 /*--------------------------------------------------------------------------------------*/
 
-__X8_bits PA;
-__X8_bits PB;
-__X8_bits PC;
-__X8_bits PD;
-__X8_bits PE;
-__X8_bits TRSA;
-__X8_bits TRSB;
-__X8_bits TRSC;
-__X8_bits TRSD;
-__X8_bits TRSE;
+__X8_bits BPortA;
+__X8_bits BPortB;
+__X8_bits BPortC;
+__X8_bits BPortD;
+__X8_bits BPortE;
+__X8_bits BTrisA;
+__X8_bits BTrisB;
+__X8_bits BTrisC;
+__X8_bits BTrisD;
+__X8_bits BTrisE;
 
-#byte PA = PORTA_ADDR
-#byte PB = PORTB_ADDR
-#byte PC = PORTC_ADDR
-#byte PD = PORTD_ADDR
-#byte PE = PORTE_ADDR
+#byte BPortA            = PORTA_ADDR
+#byte BPortB            = PORTB_ADDR
+#byte BPortC            = PORTC_ADDR
+#byte BPortD            = PORTD_ADDR
+#byte BPortE            = PORTE_ADDR
 
-#byte PORTA = PORTA_ADDR
-#byte PORTB = PORTB_ADDR
-#byte PORTC = PORTC_ADDR
-#byte PORTD = PORTD_ADDR
-#byte PORTE = PORTE_ADDR
+#byte PORTA             = PORTA_ADDR
+#byte PORTB             = PORTB_ADDR
+#byte PORTC             = PORTC_ADDR
+#byte PORTD             = PORTD_ADDR
+#byte PORTE             = PORTE_ADDR
 
 #define GET_PORTA() PORTA
 #define SET_PORTA(x) PORTA = x
@@ -194,19 +282,18 @@ __X8_bits TRSE;
 #define SET_PORTD(x) PORTD = x
 #define GET_PORTE() PORTE
 #define SET_PORTE(x) PORTE = x
-#define SET_PORT(mode, x) if(mode == 0){PORTA=x;} else if(mode == 1){PORTB = x;} else if (mode == 2) {PORTC=x;} else if (mode == 3) {PORTD=x;} else if (mode == 4) {PORTE=x;}
 
-#byte TRSA = TRISA_ADDR
-#byte TRSB = TRISB_ADDR
-#byte TRSC = TRISC_ADDR
-#byte TRSD = TRISD_ADDR
-#byte TRSE = TRISE_ADDR
+#byte BTrisA            = TRISA_ADDR
+#byte BTrisB            = TRISB_ADDR
+#byte BTrisC            = TRISC_ADDR
+#byte BTrisD            = TRISD_ADDR
+#byte BTrisE            = TRISE_ADDR
 
-#byte TRISA = TRISA_ADDR
-#byte TRISB = TRISB_ADDR
-#byte TRISC = TRISC_ADDR
-#byte TRISD = TRISD_ADDR
-#byte TRISE = TRISE_ADDR
+#byte TRISA             = TRISA_ADDR
+#byte TRISB             = TRISB_ADDR
+#byte TRISC             = TRISC_ADDR
+#byte TRISD             = TRISD_ADDR
+#byte TRISE             = TRISE_ADDR
 
 #define GET_TRISA() TRISA
 #define SET_TRISA(x) TRISA = x
@@ -218,7 +305,6 @@ __X8_bits TRSE;
 #define SET_TRISD(x) TRISD = x
 #define GET_TRISE() TRISE
 #define SET_TRISE(x) TRISE = x
-#define SET_TRIS(mode, x) if(mode == 0){TRISA=x;} else if(mode == 1){TRISB = x;} else if (mode == 2) {TRISC=x;} else if (mode == 3) {TRISD=x;} else if (mode == 4) {TRISE=x;}
 //
 
 
@@ -227,18 +313,21 @@ __X8_bits TRSE;
 /*--------------------------------------------------------------------------------------*/
 // 74HC595 Supported                                                                    //
 /*--------------------------------------------------------------------------------------*/
-#define PRTA 0
-#define PRTB 1
-#define PRTC 2
-#define PRTD 3
-#define PRTE 4
-
 typedef struct {__int8__ clockPin; __int8__ dataPin; __int8__ laughtPin; __int8__ resetPin;} __74hc595__;
-extern void init_74HC595(__int8__ portSelected, __74hc595__ * configued){
+extern void init_74HC595(__int8__ * portSelected, __74hc595__ * configued){
     // Setting output mode:
-    SET_TRIS(portSelected, ~((0x01 << configued->clockPin) | (0x01 << configued->dataPin) | (0x01 << configued->laughtPin) | (0x01 << configued->resetPin)));
-    SET_PORT(portSelected,(0x01 << configued->clockPin) | (0x01 << configued->dataPin) | (0x01 << configued->laughtPin) | (0x01 << configued->resetPin));
-}
+    if (portSelected == &PORTA)
+       TRISA = ~((0x01 << configued->clockPin) | (0x01 << configued->dataPin) | (0x01 << configued->laughtPin) | (0x01 << configued->resetPin)));
+    else if(portSelected == &PORTB)
+        TRISB = ~((0x01 << configued->clockPin) | (0x01 << configued->dataPin) | (0x01 << configued->laughtPin) | (0x01 << configued->resetPin)));
+    else if(portSelected == &PORTC)
+        TRISC = ~((0x01 << configued->clockPin) | (0x01 << configued->dataPin) | (0x01 << configued->laughtPin) | (0x01 << configued->resetPin)));
+    else if(portSelected == &PORTD)
+        TRISD = ~((0x01 << configued->clockPin) | (0x01 << configued->dataPin) | (0x01 << configued->laughtPin) | (0x01 << configued->resetPin)));
+    else if(portSelected == &PORTE)
+        TRISE = ~((0x01 << configued->clockPin) | (0x01 << configued->dataPin) | (0x01 << configued->laughtPin) | (0x01 << configued->resetPin)));
+    *portSelected |= (0x01 << configued->clockPin) | (0x01 << configued->dataPin) | (0x01 << configued->laughtPin) | (0x01 << configued->resetPin);
+} 
 
 extern void run8_74HC595( __int8__ * portSelected, __74hc595__ * configued, __uint8__ data){
     tmp = 0;
@@ -281,4 +370,3 @@ extern void reset_74HC595(__int8__ * portSelected, __74hc595__ * configued){
 }
 //
 #endif
-
