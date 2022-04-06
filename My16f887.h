@@ -6,7 +6,6 @@
 //
 #ifndef __My16f887_h__
 #define __My16f887_h__
-#endif
 
 int tmp, tmp1;
 
@@ -243,11 +242,11 @@ typedef struct {
     } __X8_bits;
 //
 
-//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
 
-/*--------------------------------------------------------------------------------------*/
+/*-------------------------------------------------------------------------------------------*/
 // DEFINE PORT<A:E> REGISTER MEMORY: BPort<A:E>.P<0:7>, PORT<A:E> BTris<A:E>.B<0:7> TRIS<A:E>//
-/*--------------------------------------------------------------------------------------*/
+/*-------------------------------------------------------------------------------------------*/
 
 __X8_bits BPortA;
 __X8_bits BPortB;
@@ -306,13 +305,17 @@ __X8_bits BTrisE;
 #define GET_TRISE() TRISE
 #define SET_TRISE(x) TRISE = x
 //
+#endif
+
 
 
 //////////////////////////////////////////////////////////////////////////////////////////
-
 /*--------------------------------------------------------------------------------------*/
 // 74HC595 Supported                                                                    //
 /*--------------------------------------------------------------------------------------*/
+#ifndef __my_74hc595__
+#define __my_74hc595__
+
 typedef struct {__int8__ clockPin; __int8__ dataPin; __int8__ laughtPin; __int8__ resetPin;} __74hc595__;
 extern void init_74HC595(__int8__ * portSelected, __74hc595__ * configued){
     // Setting output mode:
@@ -369,4 +372,145 @@ extern void reset_74HC595(__int8__ * portSelected, __74hc595__ * configued){
     delay_us(20);
 }
 //
+#endif
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+/*--------------------------------------------------------------------------------------*/
+// ADC Supported                                                                        //
+/*--------------------------------------------------------------------------------------*/
+#ifndef __my_adc__
+#define __my_adc__
+
+// Clock souce:
+#define Fosc_2          0
+#define Fosc_8          1
+#define Fosc_32         2
+#define Frc             3
+
+#define ADC_RightFormat 1 
+#define ADC_LeftFormat  0
+#define VREFPlus_Pin    1
+#define VSS             0
+#define VREFMinus_Pin   1
+#define VDD             0
+
+#define AN0             1
+#define AN1             2
+#define AN2             4
+#define AN3             8
+#define AN4             16
+#define AN5             32
+#define AN6             64
+#define AN7             128
+#define AN8             256
+#define AN9             512
+#define AN10            1024
+#define AN11            2048
+#define AN12            4096
+#define AN13            8192
+#define CVREF           16384
+#define FIXREF          32768
+
+
+#define SELECTED_AN0             0
+#define SELECTED_AN1             1
+#define SELECTED_AN2             2
+#define SELECTED_AN3             3
+#define SELECTED_AN4             4
+#define SELECTED_AN5             5
+#define SELECTED_AN6             6
+#define SELECTED_AN7             7
+#define SELECTED_AN8             8
+#define SELECTED_AN9             9
+#define SELECTED_AN10            10
+#define SELECTED_AN11            11
+#define SELECTED_AN12            12
+#define SELECTED_AN13            13
+#define SELECTED_CVREF           14
+#define SELECTED_FIXREF          15
+
+#define ADC_ON          1
+#define ADC_OFF         0
+
+
+typedef struct {
+    unsigned ADCS : 2; 
+    unsigned CHS : 4; 
+    unsigned GO_DONE : 1; 
+    unsigned ADON : 1; 
+    } __ADCON0_bits;
+    
+typedef struct {
+    unsigned ADFM : 1; 
+    unsigned UNKNOW1: 1; 
+    unsigned VCFG1 : 1; 
+    unsigned VCFG0 : 1; 
+    unsigned UNKNOW2: 4; 
+    } __ADCON1_bits;
+__ADCON1_bits B_ADCON1
+__ADCON0_bits B_ADCON0;
+#byte B_ADCON0 = ADCON0_ADDR
+#byte B_ADCON1 = ADCON1_ADDR
+
+extern void init_ADC(__uint8__ ADCChannel, __int8__ clock, __int8__ ResultFormat, __int8__ voltageRef_plus, __int8__ voltageRef_minus){
+    // Configuration for the ADC (Anolog-to-Digital)
+    /***********************************************/
+
+    // Port configuration:
+    if (ADCChannel & AN0) BPortA.P0 = 1;
+    if (ADCChannel & AN1) BPortA.P1 = 1;
+    if (ADCChannel & AN2) BPortA.P2 = 1;
+    else if (ADCChannel & CVREF) BPortA.P2 = 0;
+    if (ADCChannel & AN3) BPortA.P3 = 1;
+    if (ADCChannel & AN4) BPortA.P5 = 1;
+    if (ADCChannel & AN5) BPortE.P0 = 1;
+    if (ADCChannel & AN6) BPortE.P1 = 1;
+    if (ADCChannel & AN7) BPortE.P2 = 1;
+    if (ADCChannel & AN8) BPortB.P2 = 1;
+    if (ADCChannel & AN9) BPortB.P3 = 1;
+    if (ADCChannel & AN10) BPortB.P1 = 1;
+    if (ADCChannel & AN11) BPortB.P4 = 1;
+    if (ADCChannel & AN12) BPortB.P0 = 1;
+    if (ADCChannel & AN13) BPortB.P5 = 1;
+    // ADCON1:
+    ADCON1 = (ResultFormat << 7) | (voltageReg_plus << 5) | (voltageReg_minus << 4);
+
+    // Setting Analog for pin:
+    ANSEL = ADCChannel & 0xff;
+    ANSELH = ((ADCChannel & 0x3f00) >> 8);
+}
+
+extern void reset_ADCPin(__int16__ channels){
+    B_ADCON0.ADON = 0;
+    ANSEL &= ~(ADCChannel & 0xff);
+    ANSELH &= ~((ADCChannel & 0x3f00) >> 8);
+}
+
+__int8__ * tmpADCRead;
+
+extern __int16__ read_ADC(__int16__ pinSelected = -1){
+    // Disable ADC
+    B_ADCON0.ADON = 0;
+    if (pinSelecter == -1)
+        if (*tmpADCRead >= 0 && *tmpADCRead <= 15)
+            B_ADCON0.CHS = *tmpADCRead;
+        else return __int16__(0);
+    else {
+        B_ADCON0.CHS = pinSelected;
+        *tmpADCRead = __int8__(B_ADCON0.CHS);
+    }
+    // Enable ADC
+    B_ADCON0.ADON = 1;
+
+    B_ADCON0.GO_DONE = 1;
+    while(B_ADCON0.GO_DONE);
+        if (B_ADCON1.ADFM == 1)
+            return __int16__(ADRESL) | (__int16__(ADRESH & 0x03) << 8);
+        else
+            return __int16__(ADRESL >> 6) | (__int16__(ADRESH) << 2);
+}
+#endif
+
+
 #endif
