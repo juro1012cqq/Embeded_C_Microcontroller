@@ -7,7 +7,7 @@
 #ifndef __My16f887_h__
 #define __My16f887_h__
 
-int tmp, tmp1;
+int tmp;
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
@@ -316,59 +316,77 @@ __X8_bits BTrisE;
 #ifndef __my_74hc595__
 #define __my_74hc595__
 
-typedef struct {__int8__ clockPin; __int8__ dataPin; __int8__ laughtPin; __int8__ resetPin;} __74hc595__;
-extern void init_74HC595(__int8__ * portSelected, __74hc595__ * configued){
-    // Setting output mode:
-    if (portSelected == &PORTA)
-       TRISA = ~((0x01 << configued->clockPin) | (0x01 << configued->dataPin) | (0x01 << configued->laughtPin) | (0x01 << configued->resetPin)));
-    else if(portSelected == &PORTB)
-        TRISB = ~((0x01 << configued->clockPin) | (0x01 << configued->dataPin) | (0x01 << configued->laughtPin) | (0x01 << configued->resetPin)));
-    else if(portSelected == &PORTC)
-        TRISC = ~((0x01 << configued->clockPin) | (0x01 << configued->dataPin) | (0x01 << configued->laughtPin) | (0x01 << configued->resetPin)));
-    else if(portSelected == &PORTD)
-        TRISD = ~((0x01 << configued->clockPin) | (0x01 << configued->dataPin) | (0x01 << configued->laughtPin) | (0x01 << configued->resetPin)));
-    else if(portSelected == &PORTE)
-        TRISE = ~((0x01 << configued->clockPin) | (0x01 << configued->dataPin) | (0x01 << configued->laughtPin) | (0x01 << configued->resetPin)));
-    *portSelected |= (0x01 << configued->clockPin) | (0x01 << configued->dataPin) | (0x01 << configued->laughtPin) | (0x01 << configued->resetPin);
+
+typedef struct {__int8__ portSelected; __int8__ clockPin; __int8__ dataPin; __int8__ laughtPin; __int8__ resetPin; } __74hc595__;
+__74hc595__  variable74HC595 = {-1, 0, 0, 0, 0};
+inline void init_74HC595(){
+    if (variable74HC595.portSelected <0 || 
+    variable74HC595.clockPin <0 || 
+    variable74HC595.dataPin < 0 || 
+    variable74HC595.resetPin < 0|| 
+    variable74HC595.laughtPin < 0){
+        variable74HC595.portSelected = &PORTD;
+        variable74HC595.clockPin = 1;
+        variable74HC595.dataPin = 0;
+        variable74HC595.laughtPin = 2;
+        variable74HC595.resetPin = 3;
+        TRISD = ~((0x01 << 1) | (0x01 << 0) | (0x01 << 2) | (0x01 << 3));
+        PORTD |= (0x01 << 1) | (0x01 << 0) | (0x01 << 2) | (0x01 << 3);
+    }
+    else
+        {
+            // Setting output mode:
+        if (variable74HC595.portSelected == &PORTA)
+            TRISA = ~((0x01 << variable74HC595.clockPin) | (0x01 << variable74HC595.dataPin) | (0x01 <<  variable74HC595.laughtPin) | (0x01 << variable74HC595.resetPin));
+        else if(variable74HC595.portSelected == &PORTB)
+            TRISB = ~((0x01 << variable74HC595.clockPin) | (0x01 << variable74HC595.dataPin) | (0x01 <<  variable74HC595.laughtPin) | (0x01 << variable74HC595.resetPin));
+        else if(variable74HC595.portSelected == &PORTC)
+            TRISC = ~((0x01 << variable74HC595.clockPin) | (0x01 << variable74HC595.dataPin) | (0x01 <<  variable74HC595.laughtPin) | (0x01 << variable74HC595.resetPin));
+        else if(variable74HC595.portSelected == &PORTD)
+            TRISD = ~((0x01 << variable74HC595.clockPin) | (0x01 << variable74HC595.dataPin) | (0x01 <<  variable74HC595.laughtPin) | (0x01 << variable74HC595.resetPin));
+        else if(variable74HC595.portSelected == &PORTE)
+            TRISE = ~((0x01 << variable74HC595.clockPin) | (0x01 << variable74HC595.dataPin) | (0x01 <<  variable74HC595.laughtPin) | (0x01 << variable74HC595.resetPin));
+        *variable74HC595.portSelected |= (0x01 << variable74HC595.clockPin) | (0x01 << variable74HC595.dataPin) | (0x01 <<  variable74HC595.laughtPin) | (0x01 << variable74HC595.resetPin);
+    }
 } 
 
-extern void run8_74HC595( __int8__ * portSelected, __74hc595__ * configued, __uint8__ data){
+inline void run8_74HC595(__uint8__ data){
     tmp = 0;
     for (;tmp<8; tmp++){
         if ((data & (1<< (7- tmp))) >> (7- tmp))
-            *portSelected |= 0x01 << configued->dataPin;
-        else *portSelected &= ~(0x01 << configued->dataPin);
+            *variable74HC595.portSelected |= 0x01 << variable74HC595.dataPin;
+        else *variable74HC595.portSelected &= ~(0x01 << variable74HC595.dataPin);
         delay_us(20);
-        *portSelected &= ~(0x01 << configued->clockPin);
+        *variable74HC595.portSelected &= ~(0x01 << variable74HC595.clockPin);
         delay_us(20);
-        *portSelected |= (0x01 << configued->clockPin);
+        *variable74HC595.portSelected |= (0x01 << variable74HC595.clockPin);
         delay_us(20);
     }
-    *portSelected &= ~(0x01 << configued->laughtPin);
+    *variable74HC595.portSelected &= ~(0x01 << variable74HC595.laughtPin);
     delay_us(20);
-    *portSelected |= (0x01 << configued->laughtPin);
+    *variable74HC595.portSelected |= (0x01 << variable74HC595.laughtPin);
     delay_us(20);
 }
 
-extern void run16_74HC595(__int8__ * portSelected, __74hc595__ * configued, __uint16__ data){
-    run8_74HC595(portSelected, configued, (__uint8__)(data & 0xff));
-    run8_74HC595(portSelected, configued, (__uint8__)((data >> 8) & 0xff));
+inline void run16_74HC595(__uint16__ data){
+    run8_74HC595((__uint8__)(data & 0xff));
+    run8_74HC595((__uint8__)((data >> 8) & 0xff));
 }
 
-extern void run32_74HC595(__int8__ * portSelected, __74hc595__ * configued, __uint32__ data){
-    run16_74HC595(portSelected, configued, (__uint16__)(data & 0xffff));
-    run16_74HC595(portSelected, configued, (__uint16__)((data >> 16) & 0xffff));
+inline void run32_74HC595(__uint32__ data){
+    run16_74HC595((__uint16__)(data & 0xffff));
+    run16_74HC595((__uint16__)((data >> 16) & 0xffff));
 }
 
-extern void reset_74HC595(__int8__ * portSelected, __74hc595__ * configued){
+inline void reset_74HC595(){
     tmp = 0;
-    *portSelected &= ~(0x01 << configued->resetPin);
+    *variable74HC595.portSelected &= ~(0x01 << variable74HC595.resetPin);
     delay_ms(20);
-    *portSelected &= ~(0x01 << configued->laughtPin);
+    *variable74HC595.portSelected &= ~(0x01 << variable74HC595.laughtPin);
     delay_us(20);
-    *portSelected |= (0x01 << configued->laughtPin);
+    *variable74HC595.portSelected |= (0x01 << variable74HC595.laughtPin);
     delay_us(20);
-    *portSelected |= (0x01 << configued->resetPin);
+    *variable74HC595.portSelected |= (0x01 << variable74HC595.resetPin);
     delay_us(20);
 }
 //
@@ -395,7 +413,7 @@ extern void reset_74HC595(__int8__ * portSelected, __74hc595__ * configued){
 #define VREFMinus_Pin   1
 #define VDD             0
 
-#define AN0             1
+#define AN0             ADC_RightFormat
 #define AN1             2
 #define AN2             4
 #define AN3             8
@@ -431,7 +449,7 @@ extern void reset_74HC595(__int8__ * portSelected, __74hc595__ * configued){
 #define SELECTED_FIXREF          15
 
 #define ADC_ON          1
-#define ADC_OFF         0
+#define ADC_OFF         SELECTED_AN0
 
 
 typedef struct {
@@ -448,7 +466,7 @@ typedef struct {
     unsigned VCFG0 : 1; 
     unsigned UNKNOW2: 4; 
     } __ADCON1_bits;
-__ADCON1_bits B_ADCON1
+__ADCON1_bits B_ADCON1;
 __ADCON0_bits B_ADCON0;
 #byte B_ADCON0 = ADCON0_ADDR
 #byte B_ADCON1 = ADCON1_ADDR
@@ -474,14 +492,14 @@ extern void init_ADC(__uint8__ ADCChannel, __int8__ clock, __int8__ ResultFormat
     if (ADCChannel & AN12) BPortB.P0 = 1;
     if (ADCChannel & AN13) BPortB.P5 = 1;
     // ADCON1:
-    ADCON1 = (ResultFormat << 7) | (voltageReg_plus << 5) | (voltageReg_minus << 4);
+    ADCON1 = (ResultFormat << 7) | (voltageRef_plus << 5) | (voltageRef_minus << 4);
 
     // Setting Analog for pin:
     ANSEL = ADCChannel & 0xff;
     ANSELH = ((ADCChannel & 0x3f00) >> 8);
 }
 
-extern void reset_ADCPin(__int16__ channels){
+extern void reset_ADCPin(__int16__ ADCChannel){
     B_ADCON0.ADON = 0;
     ANSEL &= ~(ADCChannel & 0xff);
     ANSELH &= ~((ADCChannel & 0x3f00) >> 8);
@@ -492,13 +510,13 @@ __int8__ * tmpADCRead;
 extern __int16__ read_ADC(__int16__ pinSelected = -1){
     // Disable ADC
     B_ADCON0.ADON = 0;
-    if (pinSelecter == -1)
+    if (pinSelected == -1)
         if (*tmpADCRead >= 0 && *tmpADCRead <= 15)
             B_ADCON0.CHS = *tmpADCRead;
-        else return __int16__(0);
+        else return (__int16__)(0);
     else {
         B_ADCON0.CHS = pinSelected;
-        *tmpADCRead = __int8__(B_ADCON0.CHS);
+        *tmpADCRead = (__int8__)(B_ADCON0.CHS);
     }
     // Enable ADC
     B_ADCON0.ADON = 1;
@@ -506,9 +524,9 @@ extern __int16__ read_ADC(__int16__ pinSelected = -1){
     B_ADCON0.GO_DONE = 1;
     while(B_ADCON0.GO_DONE);
         if (B_ADCON1.ADFM == 1)
-            return __int16__(ADRESL) | (__int16__(ADRESH & 0x03) << 8);
+            return (__int16__)(ADRESL) | ((__int16__)(ADRESH & 0x03) << 8);
         else
-            return __int16__(ADRESL >> 6) | (__int16__(ADRESH) << 2);
+            return (__int16__)(ADRESL >> 6) | ((__int16__)(ADRESH) << 2);
 }
 #endif
 
